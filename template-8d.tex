@@ -54,38 +54,33 @@
 
 \classification{<Replace this text with PACS numbers; choose from this list:
                 \texttt{http://www.aip..org/pacs/index.html}>}
-\keywords      {FS LSSVM, Big Data, Large Scale Models, Kernel SVM}
+\keywords      {FS-LSSVM, Big Data, Large Scale Models, Non-linear SVM}
 
 \author{Mandar Chandorkar}{
-  address={<author1 address>}
+  address={ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ B-3001 Leuven, Belgium}
 }
 
 \author{Oliver Lauwers}{
-  address={<common address for author2 and author3>}
-}
+  address={<oliver.lauwers,raghvendra.mall,johan.suykens,bart.demoor>@esat.kuleuven.be},altaddress={ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ B-3001 Leuven, Belgium}}
 
 \author{Raghvendra Mall}{
-  address={<common address for author2 and author3>}
-  ,altaddress={<author1 address>} % additional visiting address
+  address={<oliver.lauwers,raghvendra.mall,johan.suykens,bart.demoor>@esat.kuleuven.be},altaddress={ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ B-3001 Leuven, Belgium}}% additional visiting address
+
+
+\author{Johan A.K Suykens}{
+  address={<oliver.lauwers,raghvendra.mall,johan.suykens,bart.demoor>@esat.kuleuven.be},altaddress={ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ B-3001 Leuven, Belgium} % additional visiting address
 }
 
-\author{Johann A.K Suykens}{
-  address={<common address for author2 and author3>}
-  ,altaddress={<author1 address>} % additional visiting address
+\author{Bart De Moor}{
+  address={<oliver.lauwers,raghvendra.mall,johan.suykens,bart.demoor>@esat.kuleuven.be},altaddress={ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ B-3001 Leuven, Belgium} % additional visiting address
 }
+
 
 
 \begin{abstract}
- This template file shows how to use the \texttt{aipproc} class to
- produce a paper with the correct layout for \emph{%
-   AIP Conference Proceedings  8.5in x 11in double column}.
-
- A full description of the features supported by the \texttt{aipproc}
- class can be found in the \texttt{aipguide.pdf} document accompanying
- the distribution.
-
- Frequently asked questions can be found in the \texttt{FAQ.txt}
- document.
+ We propose \textit{Bayes Learn}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
+ 
+ A kernel based \emph{Fixed Size Least Squares Support Vector Machine} (FS LS-SVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the above model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley} and \emph{Forest Cover} and evaluate the performance of various kernel in combination with LS-SVMs.     
 \end{abstract}
 
 \maketitle
@@ -94,35 +89,22 @@
 %% MAINMATTER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{<A section>}
+\section{Background}
 
-  Infandum, regina, iubes renovare dolorem, Troianas ut opes et
-  lamentabile regnum cruerint Danai; quaeque ipse miserrima vidi, et
-  quorum pars magna fui. Quis talia fando Myrmidonum Dolopumve aut
-  duri miles Ulixi temperet a lacrimis? Et iam nox umida caelo
-  praecipitat, suadentque cadentia sidera somnos.
+The 21'st century stands out in how mankind learned the value of storing and making predictions/decisions from large volumes of data. A significant aspect of large scale data analysis is distributed computation frameworks like \textit{High Performance Computing}, \textit{Message Passing Interface} etc. Recently large scale commodity hardware clusters have replaced the two former frameworks as the most popular model for parallel data analysis. With this crucial change in hardware came a change in computational models as well. It is at this juncture that distributed \textit{Map Reduce} became the de-facto computational philosophy for large scale data analysis and  words such as \textit{Hadoop} and \textit{Apache Spark} have become synonymous with large scale data analysis and machine learning.
 
-\section{<Another section>}
+Along with innovation in hardware design and distributed computing models, there came a need for good programming libraries and frameworks to work with various Machine Learning models on large data sets. Halevy et. al \cite{10.1109/MIS.2009.36} in the paper titled "The Unreasonable Effectiveness of Data" demonstrated how gigantic language corpus encapsulate almost all aspects of human language and speech. So far the prevalent 'motto' in the Internet industry has been "large data, simple models", which is a misunderstood phrase as it can be confused as a statement of \textit{Occam's Razor}. The decomposition of the generalization error in Machine Learning is the well known "bias-variance" trade off \cite{Valentini2004}, from that one can observe that there is an optimal point between the bias and variance of a model such that the generalization error is minimum.
 
-\subsection{<A subsection>}
+Therefore, in order to extract maximum value from large scale data, one must have the flexibility to train and compare different model families before arriving at one that fits the need. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of use are of paramount importance while designing Machine Learning software for large scale data applications. In the sections that follow, we review the \textit{Fixed Size Least Squares Support Vector Machine} algorithm as outlined by Brabanter et al \cite{DeBrabanter2010} and give an introduction to \textit{Bayes Learn} and its component modules.
 
-Infandum, regina, iubes renovare dolorem, Troianas ut opes et
-lamentabile\footnote{Here we test footnotes.} regnum cruerint Danai;
-quaeque ipse miserrima vidi, et quorum pars magna fui. Quis talia
-fando Myrmidonum Dolopumve aut duri miles Ulixi temperet a
-lacrimis? Et iam nox umida caelo praecipitat, suadentque cadentia
-sidera somnos. Sed si tantus amor casus cognoscere nostros
-et\footnote{Et iam nox umida caelo praecipitat, suadentque cadentia
-sidera somnos. Et iam nox umida caelo praecipitat, suadentque cadentia
-sidera somnos.} breviter Troiae supremum audire laborem, quamquam
-animus meminisse\footnote{Here we test footnotes.} horret, luctuque
-refugit, incipiam.  Et iam nox umida caelo praecipitat, suadentque
-cadentia sidera somnos. Sed si tantus amor casus
-cognoscere\footnote{Here we test footnotes.} nostros et breviter Troiae
-supremum audire laborem, quamquam animus meminisse horret,
-luctuque refugit, incipiam.
+\section{Least Squares Support Vector Machines}
 
-Some url test \url{http://www.world.universe}.
+\subsection{Formulation}
+ Least Squares Support Vector Machines (LS-SVM) \cite{Suykens1999} are a modification of the original SVM formulation by replacing the \textit{hinge} loss function by the \textit{squared error} loss function as shown in equations .
+ 
+\begin{equation}
+J_{ion}=A\frac{exp\left[-\frac{E_a}{kT}\right]}{kT}\alpha \label{ionflux}
+\end{equation} 
 
 \subsubsection{<A subsubsection>}
 
@@ -140,10 +122,10 @@ praecipitat, suadentque cadentia sidera somnos. See \eqref{ionflux}.
 
 Infandum, regina, iubes renovare dolorem, Troianas ut opes et
 lamentabile regnum cruerint Danai; quaeque ipse miserrima vidi, et
-quorum pars magna fui \cite{Brown2000,BrownAustin:2000}. Quis talia fando
+quorum pars magna fui \cite{Suykens2002}. Quis talia fando
 Myrmidonum Dolopumve aut duri miles Ulixi temperet
-\cite{Mittelbach/Schoepf:1990} a lacrimis? Et iam
-nox umida caelo praecipitat, suadentque \cite{Wang} cadentia
+\cite{Suykens2002} a lacrimis? Et iam
+nox umida caelo praecipitat, suadentque \cite{Suykens2002} cadentia
 sidera somnos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -230,17 +212,17 @@ In the following we test itemize environments up to the forth level.
 Infandum, regina, iubes renovare dolorem, Troianas ut opes et
 lamentabile regnum cruerint Danai; quaeque ipse miserrima vidi, et
 quorum pars magna fui. Quis talia fando Myrmidonum Dolopumve aut duri
-miles Ulixi temperet a \cite{EVH:Office} lacrimis? In the following we
+miles Ulixi temperet a \cite{Suykens2002} lacrimis? In the following we
 test enumrerate environments up to the second level. In addition we
 look how ridiculous large labels look.
 \begin{enumerate}
 \item
-  An item \cite{Liang:1983}
+  An item \cite{Suykens2002}
 \item
   Another item with sub entries
   \begin{enumerate}
   \item
-   A sub entry \cite{Wang}
+   A sub entry \cite{Suykens2002}
   \item
    Second sub entry
   \end{enumerate}
@@ -278,12 +260,12 @@ lamentabile regnum cruerint Danai; quaeque ipse miserrima vidi, et
 quorum pars magna fui. Quis talia fando Myrmidonum Dolopumve aut duri
 miles Ulixi temperet a lacrimis? Et iam nox umida caelo praecipitat,
 suadentque cadentia sidera somnos. Sed si tantus amor casus
-\cite{Liang:1983} cognoscere nostros et breviter Troiae supremum
+\cite{Suykens2002} cognoscere nostros et breviter Troiae supremum
 audire laborem, quamquam animus meminisse horret, luctuque refugit,
 incipiam.  Infandum, regina, iubes renovare dolorem, Troianas ut opes
 et lamentabile regnum cruerint Danai; quaeque ipse miserrima vidi, et
 quorum pars magna fui. Quis talia fando Myrmidonum Dolopumve aut duri
-miles Ulixi temperet a \cite{SJ:1999} lacrimis? Et iam nox umida caelo
+miles Ulixi temperet a \cite{DeBrabanter2010} lacrimis? Et iam nox umida caelo
 praecipitat, suadentque cadentia sidera somnos. Sed si tantus amor
 casus cognoscere nostros et breviter Troiae supremum audire laborem,
 quamquam animus meminisse horret, luctuque refugit, incipiam.
@@ -297,13 +279,13 @@ miles Ulixi temperet a lacrimis?
 
 Et iam nox umida caelo praecipitat, suadentque cadentia sidera
 somnos. Sed si tantus amor casus cognoscere nostros et breviter Troiae
-supremum audire \cite{Knuth:WEB} laborem, quamquam animus meminisse
+supremum audire \cite{Suykens2002} laborem, quamquam animus meminisse
 horret, luctuque refugitum, refugit, incipitat, suadenovare dolorem,
 Troianas ut opes Ulixi temperet breviter Troiaeque ipse nostros et a
 lacrimis?
 
 Infandum, regina, iubes renovare dolorem, Troianas ut opes et
-lamentabile regnum cruerint \cite{BrownAustin:2000} Danai; quaeque ipse
+lamentabile regnum cruerint \cite{Brabanter2011} Danai; quaeque ipse
 miserrima vidi, et quorum pars magna fui. Quis talia fando Myrmidonum
 Dolopumve aut duri miles Ulixi temperet a lacrimis?  Infandum, regina,
 iubes renovare dolorem, Troianas ut opes et lamentabile regnum
@@ -366,35 +348,6 @@ temperet a lacrimis?
  }
 
 \end{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The following lines show an example how to produce a bibliography
-%% without the help of the BibTeX program. This could be used instead
-%% of the above.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{thebibliography}{9}
-
-\bibitem{Brown2000}
-M.~P. Brown,  and K.~Austin, \emph{The New Physique}, Publisher Name,
-  Publisher City, 2000, pp. 212--213.
-
-\bibitem{BrownAustin:2000}
-M.~P. Brown,  and K.~Austin, \emph{Appl. Phys. Letters} \textbf{85},
-  2503--2504 (2000).
-
-\bibitem{Wang}
-R.~Wang, ``Title of Chapter,'' in \emph{Classic Physiques}, edited by
-  R.~B. Hamil, Publisher Name, Publisher City, 2000, pp. 212--213.
-
-\bibitem{SJ:1999}
-C.~D.~Smith and E.~F.~Jones,  ``Load-Cycling in Cubic Press,'' in
-  \emph{Shock Compression of Condensed Matter-1999}, edited by M.~D.~F. et~al.,
-  AIP Conference Proceedings 505, American Institute of Physics, New York,
-  1999, pp. 651--654.
-
-\end{thebibliography}
-
 \endinput
 %%
 %% End of file `template-8d.tex'.
