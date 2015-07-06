@@ -41,7 +41,7 @@
 %%  ,                 % add further options here if necessary
   ]
   {aipproc}
-
+\usepackage{amsmath}
 \layoutstyle{8x11double}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,7 +80,7 @@
 \begin{abstract}
  We propose \textit{Bayes Learn}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
  
- A kernel based \emph{Fixed Size Least Squares Support Vector Machine} (FS LS-SVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the above model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley} and \emph{Forest Cover} and evaluate the performance of various kernel in combination with LS-SVMs.     
+ A kernel based \emph{Fixed Size Least Squares Support Vector Machine} (FS-LSSVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the FS-LSSVM model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley} and \emph{Forest Cover} and evaluate the performance of various kernel in combination with LSSVMs.     
 \end{abstract}
 
 \maketitle
@@ -89,7 +89,7 @@
 %% MAINMATTER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Background}
+\section{Introduction}
 
 The 21'st century stands out in how mankind learned the value of storing and making predictions/decisions from large volumes of data. A significant aspect of large scale data analysis is distributed computation frameworks like \textit{High Performance Computing}, \textit{Message Passing Interface} etc. Recently large scale commodity hardware clusters have replaced the two former frameworks as the most popular model for parallel data analysis. With this crucial change in hardware came a change in computational models as well. It is at this juncture that distributed \textit{Map Reduce} became the de-facto computational philosophy for large scale data analysis and  words such as \textit{Hadoop} and \textit{Apache Spark} have become synonymous with large scale data analysis and machine learning.
 
@@ -100,23 +100,20 @@ Therefore, in order to extract maximum value from large scale data, one must hav
 \section{Least Squares Support Vector Machines}
 
 \subsection{Formulation}
- Least Squares Support Vector Machines (LS-SVM) \cite{Suykens1999} are a modification of the original SVM formulation by replacing the \textit{hinge} loss function by the \textit{squared error} loss function as shown in equations .
  
-\begin{equation}
-J_{ion}=A\frac{exp\left[-\frac{E_a}{kT}\right]}{kT}\alpha \label{ionflux}
-\end{equation} 
+Least Squares Support Vector Machines (LS-SVM) \cite{Suykens1999} are a modification of the original SVM formulation by replacing the \textit{hinge} loss function by the \textit{squared error} loss function as shown in equation \ref{eq:lssvm}. 
 
-\subsubsection{<A subsubsection>}
+\begin{align*}
+& min_{w,b,e}\textsl{J}(w,e) = \frac{1}{2}w^{T} w + \frac{\gamma}{2}\sum^{n}_{k=1}e_k^{2} \\   
+& s.t \ Y_{k}[w^{T} \phi(X_k) + b] = 1 - e_{k} \label{eq:lssvm}
+\end{align*}
 
-Et iam nox umida caelo praecipitat $J_{ion}$ suadentque cadentia
-sidera somnos. Sed si tantus amor casus cognoscere nostros et breviter
-Troiae $J_{ion}$ supremum audire laborem:
-\begin{equation}
-J_{ion}=A\frac{exp\left[-\frac{E_a}{kT}\right]}{kT}\alpha \label{ionflux}
-\end{equation}
-lamentabile regnum cruerint Danai; quaeque ipse miserrima vidi, et
-quorum pars magna fui. $A$ talia fando, $E_a$ iam nox umida, $k$ caelo
-praecipitat, suadentque cadentia sidera somnos. See \eqref{ionflux}.
+
+\subsubsection{Fixed Size Approximation}
+
+In order to make training of kernel based SVM models for large scale data applications feasible, one needs to make approximations to the computation of the kernel matrices. The Fixed Size LS-SVM as proposed by Brabanter, Suykens et. al \cite{DeBrabanter2010} consists of solving the LS SVM problem in the primal as follows.
+
+
 
 \paragraph{<A subsubsubsection>}
 

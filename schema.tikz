@@ -1,0 +1,29 @@
+\begin{tikzpicture} [mindmap, grow cyclic, every node/.style=concept, concept color=orange!40, 
+    level 1/.append style={level distance=4cm,sibling angle=72},
+    level 2/.append style={level distance=3cm,sibling angle=45},]
+\node{Bayes Learn}
+   child [concept color=blue!30]{ node {Model Classes}
+        child { node {Graph Based}}
+        child { node {Parametric}}
+        child { node {Linear}}
+    }
+    child [concept color=yellow!30]{ node {Kernels}
+        child { node {Mercer Kernels}}
+        child { node {Density Estimation Kernels}}
+    }
+    child [concept color=teal!30]{ node {Optimization}
+        child { node {Gradient Based}}
+        child { node {Conjugate Gradient}}
+        child { node {Global Optimization}}
+    }
+    child [concept color=purple!30]{ node {Evaluation Metrics}
+        child { node {Classification}}
+        child { node {Regression}}
+    }
+    child [concept color=green!30]{ node {Miscellaneous Utilities}
+        child { node {Prototype Selection}}
+        child { node {Summary Statistics}}
+        child { node {Entropy Computation}}
+    };
+
+\end{tikzpicture}

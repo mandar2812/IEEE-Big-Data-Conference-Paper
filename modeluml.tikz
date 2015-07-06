@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+    \begin{interface}[text width =3 cm]{Model}{0 ,0}
+        \attribute { owner : String }
+        \attribute { balance : Dollars = 0}
+        \operation { deposit ( amount : Dollars )}
+        \operation [0]{ withdrawl ( amount : Dollars )}
+    \end{interface}
+    
+    \begin{class}[text width =3 cm]{ParameterizedLearner}{ 0 , -3}
+        \inherit{Model}
+        \attribute{insufficientFundsFee : Dollars }
+        \operation{processCheck ( checkToProcess : Check)}
+        \operation{withdrawal ( amount : Dollars ) }
+    \end{class}
+    
+    \begin{class}[text width =3 cm]{LinearModel}{0 , -5}
+        \inherit{ParameterizedLearner}
+        \attribute{annualInteresRate : Percentage }
+        \operation{depositMonthlyInterest ( ) }
+        \operation{withdrawal ( amount : Dollars ) }
+    \end{class}
+\end{tikzpicture}
