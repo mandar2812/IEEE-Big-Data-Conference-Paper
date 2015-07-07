@@ -811,13 +811,9 @@ The implementation of the FS-LSSVM in DynaML, outlined in algorithm \ref{lssvmal
 
 \section{Experiments} \label{exp}
 
+The experiments are performed on a 40 core 64GB RAM machine at the Department of Electrical Engineering, KU Leuven. The performance of binary FS-LSSVM classifiers on the \textit{MAGIC Gamma} Telescope Data Set obtained from the UCI Machine Learning Repository, are summarized in table \ref{table1}. It is observed that tuning kernel models with CSA gives better results than linear FS-LSSVM models tuned on only the regularization parameter.
 
-\begin{comment}
-\csvautobooktabular[tabular=|l|c|c|c|c|c|,
-    table head=\hline & kernel & prototypes & globaloptimization & gridsize & gridresolution & areaunderROC\\\hline,
-    late after line=\\\hline]{resultsMagicGamma.csv}{kernel=\kernel,prototypes=\prototypes,globaloptimization=\globaloptimization,gridsize=\gridsize,gridresolution=\gridresolution,areaunderROC=\areaunderROC}
-{\kernel & \prototypes & \globaloptimization & \gridsize & \gridresolution & \areaunderROC}
-\end{comment}
+
 
 \begin{table*}[!t]
 \begin{center}
@@ -827,31 +823,28 @@ The implementation of the FS-LSSVM in DynaML, outlined in algorithm \ref{lssvmal
       multicolumn names, % allows to have multicolumn names
       col sep=comma, % the seperator in our .csv file
       display columns/0/.style={
-		column name=$Value 1$, % name of first column
+		column name=$Kernel$, % name of first column
 		column type={S},string type},  % use siunitx for formatting
       display columns/1/.style={
-		column name=$Value 2$,
+		column name=$Prototypes$,
 		column type={S},string type},
 	  display columns/2/.style={
-		column name=$Value 2$,
+		column name=$Global Opt.$,
 		column type={S},string type},
 	  display columns/3/.style={
-		column name=$Value 2$,
+		column name=$Grid Size$,
 		column type={S},string type},
 	  display columns/4/.style={
-		column name=$Value 2$,
+		column name=$Grid Resolution$,
 		column type={S},string type},
-	  display columns/4/.style={
-		column name=$Value 2$,
-		column type={S},string type},
-      display columns/5/.style={
-		column name=$Value 2$,
+	  display columns/5/.style={
+		column name=$Scale (Log/Linear)$,
 		column type={S},string type},
       display columns/6/.style={
-		column name=$Value 2$,
+		column name=$max F1 score$,
 		column type={S},string type},
       display columns/7/.style={
-		column name=$Value 2$,
+		column name=$area under ROC$,
 		column type={S},string type},
       every head row/.style={
 		before row={\toprule}, % have a rule at top
@@ -864,7 +857,6 @@ The implementation of the FS-LSSVM in DynaML, outlined in algorithm \ref{lssvmal
 
 
 \section{Conclusion} \label{Conclusion}
-\blindtext
 
 
 
