@@ -64,10 +64,23 @@
 % draft mode.
 %
 \documentclass[conference, cmex10]{IEEEtran}
-\usepackage{amsmath, graphicx, blindtext, tikz}
+\usepackage{amsmath, graphicx, blindtext, tikz, csvsimple}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\interdisplaylinepenalty=2500
 \usepackage{tikzscale, adjustbox}
 \usepackage[school]{pgf-umlcd}
 \usepackage{algorithm2e}
+\usepackage{verbatim} 
+\usepackage{booktabs} % For \toprule, \midrule and \bottomrule
+\usepackage{siunitx} % Formats the units and values
+\usepackage{pgfplotstable} % Generates table from .csv
+
+% Setup siunitx:
+\sisetup{
+  round-mode          = places, % Rounds numbers
+  round-precision     = 2, % to 2 places
+}
 
 %\usepackage[a4paper,margin=1cm,landscape]{geometry}
 \usetikzlibrary{mindmap, positioning,shapes,shadows,arrows}
@@ -353,20 +366,22 @@
 
 
 % correct bad hyphenation here
-\hyphenation{op-tical net-works semi-conduc-tor}
+%\hyphenation{op-tical net-works semi-conduc-tor}
+
+
 
 
 \begin{document}
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Fixed Size Least Squares Support Vector Machines: Scalable Implementation for Large Scale Predictive Models}
+\title{Fixed-Size Least Squares Support Vector Machines: Scalable Implementation for Large Scale Predictive Models}
 
 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Mandar Chandorkar\IEEEauthorrefmark{1}, Oliver Lauwers, Raghvendra Mall, Johann A.K Suykens, Bart De Moor}
+\author{\IEEEauthorblockN{Mandar Chandorkar\IEEEauthorrefmark{1}, Oliver Lauwers, Raghvendra Mall, Johan A.K Suykens, Bart De Moor}
 
 \IEEEauthorblockA{\IEEEauthorrefmark{1} ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ 
 B-3001 Leuven, Belgium}}
@@ -407,9 +422,9 @@ B-3001 Leuven, Belgium}}
 
 \begin{abstract}
 %\boldmath
- We propose \textit{Bayes Learn}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
+ We propose \textit{DynaML}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
  
- A kernel based \emph{Fixed Size Least Squares Support Vector Machine} (FS-LSSVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the FS-LSSVM model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley}, \emph{Forest Cover}, \emph{Susy} etc. and evaluate the performance of various kernel in combination with LSSVMs.     
+ A kernel based \emph{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the FS-LSSVM model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley}, \emph{Forest Cover}, \emph{Susy} etc. and evaluate the performance of various kernel in combination with LSSVMs.     
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -446,9 +461,9 @@ The $21^{st}$ century stands out in how mankind learned the value of storing and
 
 Along with innovation in hardware design and distributed computing models, there came a need for good programming libraries and frameworks to work with various Machine Learning models on large data sets. It was demonstrated in \cite{10.1109/MIS.2009.36} that a gigantic language corpus encapsulates almost all aspects of human language and speech. So far the prevalent `motto' in the Internet industry has been ``large data, simple models", which is a mis-understood phrase as it can be confused as a statement of \textit{Occam's Razor}. The decomposition of the generalization error in Machine Learning is the well known ``bias-variance" trade-off \cite{Valentini2004}, from that it can be observed that there is an optimal point between the bias and variance of a model such that the generalization error is minimum.
 
-Therefore, in order to extract maximum value from large scale data, it is imperative to have the flexibility to train and compare different model families before arriving at the one that fits the requirement of the user. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of usage are of paramount importance while designing Machine Learning software for large scale data applications. In the sections that follow, we review the \textit{Fixed Size Least Squares Support Vector Machine} (FS-LSSVM) algorithm as outlined by the authors in \cite{DeBrabanter2010} and give an introduction to \textit{Bayes Learn} and its component modules.
+Therefore, in order to extract maximum value from large scale data, it is imperative to have the flexibility to train and compare different model families before arriving at the one that fits the requirement of the user. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of usage are of paramount importance while designing Machine Learning software for large scale data applications. In the sections that follow, we review the \textit{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) algorithm as outlined by the authors in \cite{DeBrabanter2010} and give an introduction to \textit{DynaML} and its component modules.
 
-\section*{Bayes Learn}
+\section*{DynaML}
 Our library tackles three major issues w.r.t. the design of a Machine Learning research toolkit.
 
 \begin{itemize}
@@ -460,18 +475,21 @@ Learning models employ various mathematical structures; graphs, vectors, matrice
 The big data landscape has many tools which enable the storage and analysis of large streams of data, they consist of technologies such as, but not limited to \textit{Apache Spark}, \textit{Hadoop}, Graph Databases like \textit{Titan} \cite{Titan:2014}, \textit{OrientDB} \cite{OrientDB:2010}, \textit{Neo4j} \cite{Neo4j:2010}. Creating a powerful framework for model training and evaluation requires the decoupling of storage and processing infrastructure from the actual logic that implements the architecture of learning models.
 \end{itemize}
 
-In the following section we introduce the FS-LSSVM algorithm\cite{DeBrabanter2010}. Section \ref{archi} outlines the various modules that comprise Bayes Learn and their roles. An implementation of the FS-LSSVM model is constructed using the framework and tested on various data sets, with the findings outlined in \ref{exp}. Finally, we conclude in Section \ref{Conclusion}.
+In the following section we introduce the FS-LSSVM algorithm\cite{DeBrabanter2010}. Section \ref{archi} outlines the various modules that comprise DynaML and their roles. An implementation of the FS-LSSVM model is constructed using the framework and tested on various data sets, with the findings outlined in \ref{exp}. Finally, we conclude in Section \ref{Conclusion}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Least Squares Support Vector Machines}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Formulation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
-Least Squares Support Vector Machines (LSSVM) \cite{Suykens1999} introduces in the SVM formulation the \textit{squared error} loss function and equality constraints with respect to the slack variables $e_i$, as shown in equation \ref{eqlssvm}. 
-\begin{align}
-\label{eqlssvm}
-& min_{w,b,e} \ \frac{1}{2}w^{T} w + \frac{\gamma}{2}\sum^{N}_{k=1}e_k^{2} \\   
-& s.t \ Y_{k}[w^{T} \phi(X_k) + b] = 1 - e_{k}, k=1,\ldots,N
-\end{align}
+Least Squares Support Vector Machines (LSSVM) \cite{lssvmbook} \cite{Suykens1999} introduces in the SVM formulation the \textit{squared error} loss function and equality constraints with respect to the slack variables $e_i$, as shown in equation \ref{eqlssvm}. 
+\begin{equation}\label{eqlssvm}
+\begin{aligned}
+& \underset{w,b,e}{\text{min}}
+& & \mathcal{J}(w,e) = \frac{1}{2}w^{\intercal}w + \frac{\gamma}{2}\sum\limits_{i=1}^N e_{i}^2 \\
+& \text{s.t.}
+& & y_{i}[ w^{\intercal}\phi(x_{i})+b ] = 1 - e_{i}, i=1,\ldots ,N.
+\end{aligned}
+\end{equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Introducing the Lagrangian and applying the KKT conditions gives us the solution of the problem in the dual (eq. \ref{eqkkt}). This solution implies a loss of sparsity as compared to the classical SVM since each point becomes a support vector. However, we gain linearity of the solution (i.e. we do not have to solve the \textit{Quadratic Programming} problem as in the classical SVM). Solving the problem in the dual is not advantageous for large scale analysis as the size of the solution matrix is equal to the size of the original data.  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -496,34 +514,32 @@ Introducing the Lagrangian and applying the KKT conditions gives us the solution
 \end{align*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{FS-LSSVM}
-In order to make the training of kernel based SVM models for large scale data applications feasible, one needs to make approximations to the computation of the kernel matrices. The Fixed Size LSSVM as proposed by De Brabanter, Suykens et. al \cite{DeBrabanter2010} consists of solving the LSSVM problem in the primal as follows.
-
-
+In order to make the training of kernel based SVM models for large scale data applications feasible, one needs to make approximations to the computation of the kernel matrices. The Fixed-Size LSSVM (FS-LSSVM) as proposed by De Brabanter, Suykens et. al \cite{DeBrabanter2010} consists of solving the LSSVM problem in the primal as follows.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{equation}
 \label{eqfs}
-min_{w,b} \ \frac{1}{2}w^{T} w + \frac{\gamma}{2}\sum^{n}_{k=1}L_{2}(Y_{k} - w^{T} \widehat{\phi}(X_k) - b) 
+min_{w,b} \ \frac{1}{2}w^{\intercal} w + \frac{\gamma}{2}\sum^{n}_{i=1} \|(y_{i} - w^{\intercal} \hat{\phi}(x_i) - b\|_{2} 
 \end{equation}
 
-The solution of \ref{eqfs} is given by.
-
+The solution to equation \ref{eqfs} is given by:
 \begin{align*}
 \label{eqfssol}
 & \left( \begin{matrix}
-\widehat{w}\\ 
-\widehat{b}
+\hat{w}\\ 
+\hat{b}
 \end{matrix}\right ) = 
-\left ( \widehat{\Phi}^{T}_e \widehat{\Phi}_e + \frac{\mathit{I}_{m+1}}{\gamma} \right )^{-1} \widehat{\Phi}^{T}_e Y
+\left ( \hat{\Phi}^{\intercal}_e \hat{\Phi}_e + \frac{\mathit{I}_{m+1}}{\gamma} \right )^{-1} \hat{\Phi}^{\intercal}_e y
 \\ \\
-& \widehat{\Phi}_e = \begin{pmatrix}
-\widehat{\phi}_{1}(X_1) & \cdots & \widehat{\phi}_{m}(X_1) & 1\\ 
+& \hat{\Phi}_e = \begin{pmatrix}
+\hat{\phi}_{1}(x_1) & \cdots & \hat{\phi}_{m}(x_1) & 1\\ 
 \vdots &  \ddots & \vdots & \vdots\\ 
-\widehat{\phi}_{1}(X_n) & \cdots & \widehat{\phi}_{m}(X_n) & 1
+\hat{\phi}_{1}(x_n) & \cdots & \hat{\phi}_{m}(x_n) & 1
 \end{pmatrix}
 \end{align*}
 
-In the above formulation, $\widehat{\phi}(X_k)$ is an approximation to the true feature map $\phi(X_k)$ which is related to the kernel $K(X_i, X_j) = \phi(X_i)^T \phi(X_j)$ due to Mercer's theorem. The approximate feature map $\widehat{\phi}(X_k)$ is calculated using the Nystrom method as outlined in Brabanter \cite{DeBrabanter2010}. A low rank approximation to the kernel matrix is constructed by iteratively calculating a subset of the original data which maximises the \textit{Quadratic Renyi Entropy}. This procedure of extracting $\widehat{\phi}(X_k)$ from a data set, given a kernel function, is called \textit{Automatic Feature Extraction} (AFE).
+In the above formulation, $\hat{\phi}(x_k)$ is an approximation to the true feature map $\phi(x_k)$ which is related to the kernel $K(x_i, x_j) = \phi(x_i)^{\intercal} \phi(x_j)$ (Mercer's theorem). The approximate feature map $\hat{\phi}(x_k)$ is calculated using the Nystr$\ddot{o}$m method as outlined in \cite{DeBrabanter2010,Mall2015} and \cite{Mall2013}. A low rank approximation to the kernel matrix is constructed by iteratively calculating a subset of the original data which maximizes the \textit{Quadratic R\`enyi Entropy}. This procedure of extracting $\hat{\phi}(x_k)$ from a data set, given a kernel function, is called \textit{Automatic Feature Extraction} (AFE).
 
-Kernel based models suffer from sensitivity to hyper-parameters, in the case of FS-LSSVM we have to tune the model with respect to $\gamma$ the regularization parameter and the parameters of the kernel chosen. Models are generally compared with their cross validation performance in which case the objective cost function with respect to the hyper-parameters is in general non smooth. Gradient free methods like Grid Search, Nelder Mead \cite{Nelder1965} and Coupled Simulated Annealing \cite{Xavier-De-Souza2010} are suitable to tackle the model selection problem for FS-LSSVM based models.
+Kernel based models suffer from sensitivity to hyper-parameters. In the case of FS-LSSVM we have to tune the model with respect to $\gamma$ the regularization parameter and the parameters of the kernel chosen. Models are generally compared with their cross-validation performance in which case the objective cost function with respect to the hyper-parameters is in general non-smooth and non-convex. Gradient free methods like Grid Search, Nelder Mead \cite{Nelder1965} and Coupled Simulated Annealing \cite{Xavier-De-Souza2010} are suitable to tackle the problem of model selection for FS-LSSVM based kernel models.
 
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
@@ -612,14 +628,14 @@ Kernel based models suffer from sensitivity to hyper-parameters, in the case of 
 
 \section{Architecture} \label{archi}
 
-Figure \ref{fig:struct} shows the organization of modules in Bayes Learn. It can be decomposed into five principal modules.
+Figure \ref{fig:struct} shows the organization of modules in DynaML. It can be decomposed into five principal modules.
 \begin{itemize}
 \item Model Classes:
 This is the core set of classes which form the heart of the library, a number of abstract model categories are defined each with its own set of defined behaviours. 
 \item Optimization API:
-A module which houses the implementation of common optimization methods (i.e. Gradient and Gradient free). Currently Bayes Learn has implementations for Conjugate Gradient, Gradient Descent, Grid Search and Coupled Simulated Annealing \cite{Xavier-De-Souza2010}. 
+A module which houses the implementation of common optimization methods (i.e. Gradient and Gradient free). Currently DynaML has implementations for Conjugate Gradient, Gradient Descent, Grid Search and Coupled Simulated Annealing \cite{Xavier-De-Souza2010}. 
 \item Kernels:
-Bayes Learn is equipped with a powerful abstract API for representing kernel functions. The module has two abstract classes to outline the behaviors of kernels used in SVM based applications as well as density estimation. The library comes bundled with an implementation for AFE as well as for common SVM kernels i.e. RBF, Polynomial, Laplace, Exponential. New kernel functions can be easily added to the library by extending the base classes in this module.
+DynaML is equipped with a powerful abstract API for representing kernel functions. The module has two abstract classes to outline the behaviors of kernels used in SVM based applications as well as density estimation. The library comes bundled with an implementation for AFE as well as for common SVM kernels i.e. RBF, Polynomial, Laplace, Exponential. New kernel functions can be easily added to the library by extending the base classes in this module.
 
 \item Miscellaneous Utilities:
 This module contains code to carry out auxiliary tasks for model learning and optimization. It contains the implementation of entropy calculation, summary statistics, prototype selection as well as a set of various functions which can be required for implementing new model classes using the library.  
@@ -631,7 +647,7 @@ This module contains code to carry out auxiliary tasks for model learning and op
 \begin{tikzpicture} [mindmap, grow cyclic, every node/.style=concept, concept color=orange!40, 
     level 1/.append style={level distance=4cm,sibling angle=72},
     level 2/.append style={level distance=3cm,sibling angle=45},]
-\node{Bayes Learn}
+\node{DynaML}
    child [concept color=blue!30]{ node {Model Classes}
         child { node {Graph Based}}
         child { node {Parametric}}
@@ -658,7 +674,7 @@ This module contains code to carry out auxiliary tasks for model learning and op
 
 \end{tikzpicture}
 \end{adjustbox}
-\caption{Schematic structure of Bayes Learn}
+\caption{Schematic structure of DynaML}
 \label{fig:struct}
 \end{figure}
 
@@ -772,10 +788,10 @@ The kernel module contains implementations of SVM kernels and AFE. The class \te
 \end{figure}
 
 \subsubsection*{Optimization Methods}
-Parametric models in Bayes Learn have an embedded optimization object which is inherits from the \textit{Optimizer} interface. Implementations of Conjugate Gradient and Gradient Descent are provided in the optimization module. New optimization algorithms can be added by inheriting from the top level \textit{Optimizer} interface or the \textit{RegularizedOptimizer} abstract class in case one is working with parametric models which involve regularization. Another important component of the optimization module is the \textit{GlobalOptimizer} interface which acts as a skeleton for implementing gradient free global optimization algorithms.
+Parametric models in DynaML have an embedded optimization object which is inherits from the \textit{Optimizer} interface. Implementations of Conjugate Gradient and Gradient Descent are provided in the optimization module. New optimization algorithms can be added by inheriting from the top level \textit{Optimizer} interface or the \textit{RegularizedOptimizer} abstract class in case one is working with parametric models which involve regularization. Another important component of the optimization module is the \textit{GlobalOptimizer} interface which acts as a skeleton for implementing gradient free global optimization algorithms.
 
 \section{FS-LSSVM Implementation} \label{fsimpl}
-The implementation of the FS-LSSVM in Bayes Learn, outlined in algorithm \ref{lssvmalgo} is as described in the original article of Brabanter et.al \cite{DeBrabanter2010}. Kernel based models all implement the interface \textit{GloballyOptimizable} in the optimization module. Since the \textit{GlobalOptimizer} and its subclasses (i.e. \textit{GridSearch} and \textit{CoupledSimulated Annealing}) all optimize models which implement the \text{GloballyOptimizable} interface, it enables tuning of models with a variety of global optimization algorithms convenient.
+The implementation of the FS-LSSVM in DynaML, outlined in algorithm \ref{lssvmalgo} is as described in the original article of Brabanter et.al \cite{DeBrabanter2010}. Kernel based models all implement the interface \textit{GloballyOptimizable} in the optimization module. Since the \textit{GlobalOptimizer} and its subclasses (i.e. \textit{GridSearch} and \textit{CoupledSimulated Annealing}) all optimize models which implement the \text{GloballyOptimizable} interface, it enables tuning of models with a variety of global optimization algorithms convenient.
 
 \begin{algorithm} \label{lssvmalgo}
 \SetAlgoLined
@@ -794,6 +810,58 @@ The implementation of the FS-LSSVM in Bayes Learn, outlined in algorithm \ref{ls
 \end{algorithm}
 
 \section{Experiments} \label{exp}
+
+
+\begin{comment}
+\csvautobooktabular[tabular=|l|c|c|c|c|c|,
+    table head=\hline & kernel & prototypes & globaloptimization & gridsize & gridresolution & areaunderROC\\\hline,
+    late after line=\\\hline]{resultsMagicGamma.csv}{kernel=\kernel,prototypes=\prototypes,globaloptimization=\globaloptimization,gridsize=\gridsize,gridresolution=\gridresolution,areaunderROC=\areaunderROC}
+{\kernel & \prototypes & \globaloptimization & \gridsize & \gridresolution & \areaunderROC}
+\end{comment}
+
+\begin{table*}[!t]
+\begin{center}
+\caption{Magic Gamma test results}
+    \label{table1}
+    \pgfplotstabletypeset[
+      multicolumn names, % allows to have multicolumn names
+      col sep=comma, % the seperator in our .csv file
+      display columns/0/.style={
+		column name=$Value 1$, % name of first column
+		column type={S},string type},  % use siunitx for formatting
+      display columns/1/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+	  display columns/2/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+	  display columns/3/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+	  display columns/4/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+	  display columns/4/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+      display columns/5/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+      display columns/6/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+      display columns/7/.style={
+		column name=$Value 2$,
+		column type={S},string type},
+      every head row/.style={
+		before row={\toprule}, % have a rule at top
+		after row={\midrule} % rule under units
+		},
+		every last row/.style={after row=\bottomrule}, % rule at bottom
+    ]{resultsMagicGammaProc.csv} % filename/path to file
+\end{center}
+\end{table*}
+
 
 \section{Conclusion} \label{Conclusion}
 \blindtext
@@ -818,14 +886,9 @@ The implementation of the FS-LSSVM in Bayes Learn, outlined in algorithm \ref{ls
 
 
 \appendices
-\section{Proof of the First Zonklar Equation}
-\blindtext
-
 % use section* for acknowledgement
 \section*{Acknowledgment}
 
-
-The authors would like to thank...
 
 
 % Can use something like this to put references on a page
