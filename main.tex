@@ -381,7 +381,7 @@
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Mandar Chandorkar\IEEEauthorrefmark{1}, Oliver Lauwers, Raghvendra Mall, Johan A.K Suykens, Bart De Moor}
+\author{\IEEEauthorblockN{Mandar Chandorkar\IEEEauthorrefmark{1}, Raghvendra Mall, Oliver Lauwers, Johan A.K Suykens, Bart De Moor}
 
 \IEEEauthorblockA{\IEEEauthorrefmark{1} ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ 
 B-3001 Leuven, Belgium}}
@@ -422,7 +422,7 @@ B-3001 Leuven, Belgium}}
 
 \begin{abstract}
 %\boldmath
- We propose \textit{DynaML}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
+ We propose \textit{FS-Scala}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
  
  A kernel based \emph{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the FS-LSSVM model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley}, \emph{Forest Cover}, \emph{Susy} etc. and evaluate the performance of various kernel in combination with LSSVMs.     
 
@@ -461,10 +461,10 @@ The $21^{st}$ century stands out in how mankind learned the value of storing and
 
 Along with innovation in hardware design and distributed computing models, there came a need for good programming libraries and frameworks to work with various Machine Learning models on large data sets. It was demonstrated in \cite{10.1109/MIS.2009.36} that a gigantic language corpus encapsulates almost all aspects of human language and speech. So far the prevalent `motto' in the Internet industry has been ``large data, simple models", which is a mis-understood phrase as it can be confused as a statement of \textit{Occam's Razor}. The decomposition of the generalization error in Machine Learning is the well known ``bias-variance" trade-off \cite{Valentini2004}, from that it can be observed that there is an optimal point between the bias and variance of a model such that the generalization error is minimum.
 
-Therefore, in order to extract maximum value from large scale data, it is imperative to have the flexibility to train and compare different model families before arriving at the one that fits the requirement of the user. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of usage are of paramount importance while designing Machine Learning software for large scale data applications. In the sections that follow, we review the \textit{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) algorithm as outlined by the authors in \cite{DeBrabanter2010} and give an introduction to \textit{DynaML} and its component modules.
+Therefore, in order to extract maximum value from large scale data, it is imperative to have the flexibility to train and compare different model families before arriving at the one that fits the requirement of the user. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of usage are of paramount importance while designing Machine Learning software for large scale data applications. In the sections that follow, we review the \textit{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) algorithm as outlined by the authors in \cite{DeBrabanter2010} and give an introduction to \textit{FS-Scala} and its component modules.
 
-\section*{DynaML}
-Our library tackles three major issues w.r.t. the design of a Machine Learning research toolkit.
+\section*{FS-Scala}
+Our library tackles three major issues w.r.t. the implementation of the FS-LSSVM.
 
 \begin{itemize}
 \item \textbf{Modularity}:
@@ -475,7 +475,7 @@ Learning models employ various mathematical structures; graphs, vectors, matrice
 The big data landscape has many tools which enable the storage and analysis of large streams of data, they consist of technologies such as, but not limited to \textit{Apache Spark}, \textit{Hadoop}, Graph Databases like \textit{Titan} \cite{Titan:2014}, \textit{OrientDB} \cite{OrientDB:2010}, \textit{Neo4j} \cite{Neo4j:2010}. Creating a powerful framework for model training and evaluation requires the decoupling of storage and processing infrastructure from the actual logic that implements the architecture of learning models.
 \end{itemize}
 
-In the following section we introduce the FS-LSSVM algorithm\cite{DeBrabanter2010}. Section \ref{archi} outlines the various modules that comprise DynaML and their roles. An implementation of the FS-LSSVM model is constructed using the framework and tested on various data sets, with the findings outlined in \ref{exp}. Finally, we conclude in Section \ref{Conclusion}.
+In the following section we introduce the FS-LSSVM algorithm\cite{DeBrabanter2010}. Section \ref{archi} outlines the various modules that comprise FS-Scala and their roles. An implementation of the FS-LSSVM model is constructed using the framework and tested on various data sets, with the findings outlined in \ref{exp}. Finally, we conclude in Section \ref{Conclusion}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Least Squares Support Vector Machines}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -540,6 +540,25 @@ The solution to equation \ref{eqfs} is given by:
 In the above formulation, $\hat{\phi}(x_k)$ is an approximation to the true feature map $\phi(x_k)$ which is related to the kernel $K(x_i, x_j) = \phi(x_i)^{\intercal} \phi(x_j)$ (Mercer's theorem). The approximate feature map $\hat{\phi}(x_k)$ is calculated using the Nystr$\ddot{o}$m method as outlined in \cite{DeBrabanter2010,Mall2015} and \cite{Mall2013}. A low rank approximation to the kernel matrix is constructed by iteratively calculating a subset of the original data which maximizes the \textit{Quadratic R\`enyi Entropy}. This procedure of extracting $\hat{\phi}(x_k)$ from a data set, given a kernel function, is called \textit{Automatic Feature Extraction} (AFE).
 
 Kernel based models suffer from sensitivity to hyper-parameters. In the case of FS-LSSVM we have to tune the model with respect to $\gamma$ the regularization parameter and the parameters of the kernel chosen. Models are generally compared with their cross-validation performance in which case the objective cost function with respect to the hyper-parameters is in general non-smooth and non-convex. Gradient free methods like Grid Search, Nelder Mead \cite{Nelder1965} and Coupled Simulated Annealing \cite{Xavier-De-Souza2010} are suitable to tackle the problem of model selection for FS-LSSVM based kernel models.
+
+In recent literature we find sparse reductions to FS-LSSVM methods \cite{Mall2015,Mall2013}. The authors in \cite{Mall2015,Mall2013} explore the sparsity vs error trade-off for FS-LSSVM models. Even though they run experiments on large scale datasets like Forest Cover dataset, the scalability of these methods are restricted to available memory on a single machine. Moreover, they don't exploit the possibility of parallelism available in several components of the FS-LSSVM model. Another work \cite{Mall2014} converts the Big Data into a Big Network and then uses a network based subset selection technique (FURS \cite{Mall2013FURS}) to obtain a representative subset of the original data. It then builds a FS-LSSVM model using this subset. However, in this paper we showcase that we can parallelize the subset selection technique which maximizes the \textit{Quadratic R\`enyi Entropy} for Big datasets and use the generated subset as the set of prototype vectors (PV) essential for building the FS-LSSVM model.
+
+
+\begin{algorithm} \label{lssvmalgo}
+\SetAlgoLined
+\KwData{Data Set, Kernel, Global Optimization routine, grid parameters}
+\KwResult{Tuned FS-LSSVM model}
+ Pre-process the data by mean scaling.\;
+ Calculate the prototype set using iterative 
+ sampling and Quadratic Renyi Entropy.\;
+ Initialize a grid for the hyper-parameters\;
+ \While{termination of global optimization routine}{
+  Initialize the kernel using the hyper-parameters.
+  Do AFE on the kernel matrix constructed from the prototypes, using the Nystrom method\;
+  evaluate the cross validation score for the particular hyper-parameter values\;
+ }
+ \caption{Tuning FS-LSSVM}
+\end{algorithm}
 
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
@@ -625,17 +644,19 @@ Kernel based models suffer from sensitivity to hyper-parameters. In the case of 
 % Note that, LaTeX2e, unlike IEEE journals, places footnotes above bottom
 % floats. This can be corrected via the \fnbelowfloat command of the
 % stfloats package.
+\section{FS-LSSVM Implementation} \label{fsimpl}
+The implementation of the FS-LSSVM in FS-Scala, outlined in algorithm \ref{lssvmalgo} is as described in the original article of Brabanter et.al \cite{DeBrabanter2010}. Kernel based models all implement the interface \textit{GloballyOptimizable} in the optimization module. Since the \textit{GlobalOptimizer} and its subclasses (i.e. \textit{GridSearch} and \textit{CoupledSimulated Annealing}) all optimize models which implement the \text{GloballyOptimizable} interface, it enables tuning of models with a variety of global optimization algorithms convenient.
 
-\section{Architecture} \label{archi}
+\subsection*{Architecture} \label{archi}
 
-Figure \ref{fig:struct} shows the organization of modules in DynaML. It can be decomposed into five principal modules.
+Figure \ref{fig:struct} shows the organization of modules in FS-Scala. It can be decomposed into five principal modules.
 \begin{itemize}
 \item Model Classes:
 This is the core set of classes which form the heart of the library, a number of abstract model categories are defined each with its own set of defined behaviours. 
 \item Optimization API:
-A module which houses the implementation of common optimization methods (i.e. Gradient and Gradient free). Currently DynaML has implementations for Conjugate Gradient, Gradient Descent, Grid Search and Coupled Simulated Annealing \cite{Xavier-De-Souza2010}. 
+A module which houses the implementation of common optimization methods (i.e. Gradient and Gradient free). Currently FS-Scala has implementations for Conjugate Gradient, Gradient Descent, Grid Search and Coupled Simulated Annealing \cite{Xavier-De-Souza2010}. 
 \item Kernels:
-DynaML is equipped with a powerful abstract API for representing kernel functions. The module has two abstract classes to outline the behaviors of kernels used in SVM based applications as well as density estimation. The library comes bundled with an implementation for AFE as well as for common SVM kernels i.e. RBF, Polynomial, Laplace, Exponential. New kernel functions can be easily added to the library by extending the base classes in this module.
+FS-Scala is equipped with a powerful abstract API for representing kernel functions. The module has two abstract classes to outline the behaviors of kernels used in SVM based applications as well as density estimation. The library comes bundled with an implementation for AFE as well as for common SVM kernels i.e. RBF, Polynomial, Laplace, Exponential. New kernel functions can be easily added to the library by extending the base classes in this module.
 
 \item Miscellaneous Utilities:
 This module contains code to carry out auxiliary tasks for model learning and optimization. It contains the implementation of entropy calculation, summary statistics, prototype selection as well as a set of various functions which can be required for implementing new model classes using the library.  
@@ -647,11 +668,10 @@ This module contains code to carry out auxiliary tasks for model learning and op
 \begin{tikzpicture} [mindmap, grow cyclic, every node/.style=concept, concept color=orange!40, 
     level 1/.append style={level distance=4cm,sibling angle=72},
     level 2/.append style={level distance=3cm,sibling angle=45},]
-\node{DynaML}
+\node{FS-Scala}
    child [concept color=blue!30]{ node {Model Classes}
-        child { node {Graph Based}}
-        child { node {Parametric}}
-        child { node {Linear}}
+        child { node {LSSVM Spark Model}}
+        child { node {Kernel Spark Model}}
     }
     child [concept color=yellow!30]{ node {Kernels}
         child { node {Mercer Kernels}}
@@ -674,11 +694,11 @@ This module contains code to carry out auxiliary tasks for model learning and op
 
 \end{tikzpicture}
 \end{adjustbox}
-\caption{Schematic structure of DynaML}
+\caption{Schematic structure of FS-Scala}
 \label{fig:struct}
 \end{figure}
 
-\subsection{Class Hierarchy}
+\subsection*{Class Hierarchy}
 
 Figures \ref{fig:modelUML} and \ref{fig:modelUML1} depict the class hierarchy structures of the core and optimization modules respectively, we can discuss their role in depth.
 
@@ -788,26 +808,8 @@ The kernel module contains implementations of SVM kernels and AFE. The class \te
 \end{figure}
 
 \subsubsection*{Optimization Methods}
-Parametric models in DynaML have an embedded optimization object which is inherits from the \textit{Optimizer} interface. Implementations of Conjugate Gradient and Gradient Descent are provided in the optimization module. New optimization algorithms can be added by inheriting from the top level \textit{Optimizer} interface or the \textit{RegularizedOptimizer} abstract class in case one is working with parametric models which involve regularization. Another important component of the optimization module is the \textit{GlobalOptimizer} interface which acts as a skeleton for implementing gradient free global optimization algorithms.
+Parametric models in FS-Scala have an embedded optimization object which is inherits from the \textit{Optimizer} interface. Implementations of Conjugate Gradient and Gradient Descent are provided in the optimization module. New optimization algorithms can be added by inheriting from the top level \textit{Optimizer} interface or the \textit{RegularizedOptimizer} abstract class in case one is working with parametric models which involve regularization. Another important component of the optimization module is the \textit{GlobalOptimizer} interface which acts as a skeleton for implementing gradient free global optimization algorithms.
 
-\section{FS-LSSVM Implementation} \label{fsimpl}
-The implementation of the FS-LSSVM in DynaML, outlined in algorithm \ref{lssvmalgo} is as described in the original article of Brabanter et.al \cite{DeBrabanter2010}. Kernel based models all implement the interface \textit{GloballyOptimizable} in the optimization module. Since the \textit{GlobalOptimizer} and its subclasses (i.e. \textit{GridSearch} and \textit{CoupledSimulated Annealing}) all optimize models which implement the \text{GloballyOptimizable} interface, it enables tuning of models with a variety of global optimization algorithms convenient.
-
-\begin{algorithm} \label{lssvmalgo}
-\SetAlgoLined
-\KwData{Data Set, Kernel, Global Optimization routine, grid parameters}
-\KwResult{Tuned FS-LSSVM model}
- Pre-process the data by mean scaling.\;
- Calculate the prototype set using iterative 
- sampling and Quadratic Renyi Entropy.\;
- Initialize a grid for the hyper-parameters\;
- \While{termination of global optimization routine}{
-  Initialize the kernel using the hyper-parameters.
-  Do AFE on the kernel matrix constructed from the prototypes, using the Nystrom method\;
-  evaluate the cross validation score for the particular hyper-parameter values\;
- }
- \caption{Tuning FS-LSSVM}
-\end{algorithm}
 
 \section{Experiments} \label{exp}
 
@@ -856,7 +858,7 @@ The experiments are performed on a 40 core 64GB RAM machine at the Department of
 
 \section{Conclusion} \label{Conclusion}
 
-In this paper, \textit{DynaML}, a new Scala based Machine Learning library was proposed, suitable for research and development of advanced Machine Learning models. As a use case, the kernel based FS-LSSVM model is implemented by extending the \textit{DynaML} class hierarchy, and tested on benchmark data sets. We observed that our library enables scalable implementation, tuning and evaluation of models of high complexity, while still providing flexibility to tweak various underlying data processing infrastructure.  
+In this paper, \textit{FS-Scala}, a Scala based implementation for training and tuning kernel based FS-LSSVm models. As a use case, the kernel based FS-LSSVM model is tested on benchmark data sets. We observed that our implementation enables scalable training, tuning and evaluation of models learning from Big Data, while still providing flexibility to tweak various underlying data processing infrastructure.
 
 
 
