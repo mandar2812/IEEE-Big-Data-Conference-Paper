@@ -70,11 +70,12 @@
 \interdisplaylinepenalty=2500
 \usepackage{tikzscale, adjustbox}
 \usepackage[school]{pgf-umlcd}
-\usepackage{algorithm2e}
+\usepackage[ruled,vlined]{algorithm2e}
 \usepackage{verbatim} 
 \usepackage{booktabs} % For \toprule, \midrule and \bottomrule
 \usepackage{siunitx} % Formats the units and values
 \usepackage{pgfplotstable} % Generates table from .csv
+
 
 % Setup siunitx:
 \sisetup{
@@ -375,16 +376,17 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Fixed-Size Least Squares Support Vector Machines: Scalable Implementation for Large Scale Predictive Models}
+\title{Fixed-Size Least Squares Support Vector Machines: Scala Implementation for Large Scale Binary Classification}
 
 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Mandar Chandorkar\IEEEauthorrefmark{1}, Raghvendra Mall, Oliver Lauwers, Johan A.K Suykens, Bart De Moor}
+\author{\IEEEauthorblockN{Mandar Chandorkar, Raghvendra Mall, Oliver Lauwers, Johan A.K Suykens, Bart De Moor}
 
-\IEEEauthorblockA{\IEEEauthorrefmark{1} ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ 
-B-3001 Leuven, Belgium}}
+\IEEEauthorblockA{ESAT-STADIUS KU Leuven \\ Kasteelpark Arenberg 10, \\ 
+B-3001 Leuven, Belgium}
+Email: mandar2812@gmail.com,\{raghvendra.mall,oliver.lauwers,johan.suykens,bart.demoor\}@esat.kuleuven.be}
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
 % the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
@@ -422,9 +424,7 @@ B-3001 Leuven, Belgium}}
 
 \begin{abstract}
 %\boldmath
- We propose \textit{FS-Scala}, a flexible and modular \textit{Scala} based library for the implementing and tuning large scale supervised kernel based models. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions, evaluation and probabilistic graphical models.
- 
- A kernel based \emph{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) model is implemented using the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented in the optimization module and are used to tune the hyper-parameters of the FS-LSSVM model. Finally, we carry out experiments on standard data sets like \emph{Magic Gamma}, \emph{Ripley}, \emph{Forest Cover}, \emph{Susy} etc. and evaluate the performance of various kernel in combination with LSSVMs.     
+ We propose \textit{FS-Scala}, a flexible and modular \textit{Scala} based implementation of the Fixed Size Least Squares Support Vector Machine (FS-LSSVM) for large data sets. The framework consists of a set of modules for (gradient and gradient free) optimization, model representation, kernel functions and evaluation of FS-LSSVM models. A kernel based \textit{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) model is implemented in the proposed framework, while heavily leveraging the parallel computing capabilities of \textit{Apache Spark}. Global optimization routines like \emph{Coupled Simulated Annealing} (CSA) and \emph{Grid Search} are implemented and used to tune the hyper-parameters of the FS-LSSVM model. Finally, we carry out experiments on benchmark data sets like \emph{Magic Gamma}, \emph{Forest Cover}, \emph{Susy} and \emph{higgs} etc. and evaluate the performance of various kernel based FS-LSSVM models.     
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -461,19 +461,11 @@ The $21^{st}$ century stands out in how mankind learned the value of storing and
 
 Along with innovation in hardware design and distributed computing models, there came a need for good programming libraries and frameworks to work with various Machine Learning models on large data sets. It was demonstrated in \cite{10.1109/MIS.2009.36} that a gigantic language corpus encapsulates almost all aspects of human language and speech. So far the prevalent `motto' in the Internet industry has been ``large data, simple models", which is a mis-understood phrase as it can be confused as a statement of \textit{Occam's Razor}. The decomposition of the generalization error in Machine Learning is the well known ``bias-variance" trade-off \cite{Valentini2004}, from that it can be observed that there is an optimal point between the bias and variance of a model such that the generalization error is minimum.
 
-Therefore, in order to extract maximum value from large scale data, it is imperative to have the flexibility to train and compare different model families before arriving at the one that fits the requirement of the user. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of usage are of paramount importance while designing Machine Learning software for large scale data applications. In the sections that follow, we review the \textit{Fixed-Size Least Squares Support Vector Machine} (FS-LSSVM) algorithm as outlined by the authors in \cite{DeBrabanter2010} and give an introduction to \textit{FS-Scala} and its component modules.
+Therefore, in order to extract maximum value from large scale data, it is important to have the flexibility to train and compare different model families before arriving at the one that fits the requirement of the user. Therefore one must be able to train general non linear models and tweak them by changing the various components which they employ to learn, for example a model may be linear or kernel based, it can be optimized by various methods like \textit{Stochastic Gradient Descent}, \textit{Conjugate Gradient}, etc. This is not possible in a rigid, monolithic programming framework. Modularity, extensibility and ease of usage are of paramount importance while designing Machine Learning software for large scale data applications.
 
-\section*{FS-Scala}
-Our library tackles three major issues w.r.t. the implementation of the FS-LSSVM.
+The current state of the art in distributed Machine Learning in Scala is the \textit{MLLib} module in \textit{Apache Spark} \cite{Meng}, it has implementations of Linear SVM and Logistic Regression for solving binary classification problems. But a crucial component missing in \textit{MLLib} and all distributed Machine Learning libraries is the ability to learn classification models with non linear decision boundaries. FS-Scala aims to solve the problem of scalable non-linear classification models by implementing the FS-LSSVM algorithm with model tuning capabilities.  
 
-\begin{itemize}
-\item \textbf{Modularity}:
-It is imperative in data science to tweak models by changing the various components which they employ to learn, for example a model may be linear or kernel based, it can be optimized by various methods like \textit{Stochastic Gradient Descent}, \textit{Conjugate Gradient}, etc, there may be a mechanism of model selection or hyper-parameter optimization. Keeping the source code modular enables quick development and tuning of advanced models which build on a set of common building blocks.
-\item \textbf{Flexibility of Abstraction}:
-Learning models employ various mathematical structures; graphs, vectors, matrices etc. They also have a hierarchy which defines their parameters, objective functions and by extension their behavior. By representing learning models based on a abstract class hierarchy, our library leverages \textit{Object Oriented Programming} to create a powerful and reusable code base.
-\item \textbf{Distributed Computing/Database Support}:
-The big data landscape has many tools which enable the storage and analysis of large streams of data, they consist of technologies such as, but not limited to \textit{Apache Spark}, \textit{Hadoop}, Graph Databases like \textit{Titan} \cite{Titan:2014}, \textit{OrientDB} \cite{OrientDB:2010}, \textit{Neo4j} \cite{Neo4j:2010}. Creating a powerful framework for model training and evaluation requires the decoupling of storage and processing infrastructure from the actual logic that implements the architecture of learning models.
-\end{itemize}
+In recent literature we find sparse reductions to FS-LSSVM methods \cite{Mall2015,Mall2013}. The authors in \cite{Mall2015,Mall2013} explore the sparsity vs error trade-off for FS-LSSVM models. Even though they run experiments on large scale datasets like Forest Cover dataset, the scalability of these methods are restricted to available memory on a single machine. Moreover, they don't exploit the possibility of parallelism available in several components of the FS-LSSVM model. Another work \cite{Mall2014} converts the Big Data into a Big Network and then uses a network based subset selection technique (FURS \cite{Mall2013FURS}) to obtain a representative subset of the original data. It then builds a FS-LSSVM model using this subset. However, in this paper we showcase that we can parallelize the subset selection technique which maximizes the \textit{Quadratic R\`enyi Entropy} for Big datasets and use the generated subset as the set of prototype vectors (PV) essential for building the FS-LSSVM model.
 
 In the following section we introduce the FS-LSSVM algorithm\cite{DeBrabanter2010}. Section \ref{archi} outlines the various modules that comprise FS-Scala and their roles. An implementation of the FS-LSSVM model is constructed using the framework and tested on various data sets, with the findings outlined in \ref{exp}. Finally, we conclude in Section \ref{Conclusion}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -509,16 +501,16 @@ Introducing the Lagrangian and applying the KKT conditions gives us the solution
 \end{equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 \begin{align*}
-\mathit{where} \ \Omega_{kl} &= y_{k}y_{l}K(x_{k}, x_{l}) \\
+\text{where} \ \Omega_{kl} &= y_{k}y_{l}K(x_{k}, x_{l}) \\
 \alpha &= \left[\alpha_1 ; ... ; \alpha_N \right]
 \end{align*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{FS-LSSVM}
+\subsection{FS-LSSVM} \label{sec:fs}
 In order to make the training of kernel based SVM models for large scale data applications feasible, one needs to make approximations to the computation of the kernel matrices. The Fixed-Size LSSVM (FS-LSSVM) as proposed by De Brabanter, Suykens et. al \cite{DeBrabanter2010} consists of solving the LSSVM problem in the primal as follows.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{equation}
 \label{eqfs}
-min_{w,b} \ \frac{1}{2}w^{\intercal} w + \frac{\gamma}{2}\sum^{n}_{i=1} \|(y_{i} - w^{\intercal} \hat{\phi}(x_i) - b\|_{2} 
+\min_{w,b} \ \frac{1}{2}w^{\intercal} w + \frac{\gamma}{2}\sum^{n}_{i=1} \|(y_{i} - w^{\intercal} \hat{\phi}(x_i) - b\|_{2} 
 \end{equation}
 
 The solution to equation \ref{eqfs} is given by:
@@ -541,8 +533,6 @@ In the above formulation, $\hat{\phi}(x_k)$ is an approximation to the true feat
 
 Kernel based models suffer from sensitivity to hyper-parameters. In the case of FS-LSSVM we have to tune the model with respect to $\gamma$ the regularization parameter and the parameters of the kernel chosen. Models are generally compared with their cross-validation performance in which case the objective cost function with respect to the hyper-parameters is in general non-smooth and non-convex. Gradient free methods like Grid Search, Nelder Mead \cite{Nelder1965} and Coupled Simulated Annealing \cite{Xavier-De-Souza2010} are suitable to tackle the problem of model selection for FS-LSSVM based kernel models.
 
-In recent literature we find sparse reductions to FS-LSSVM methods \cite{Mall2015,Mall2013}. The authors in \cite{Mall2015,Mall2013} explore the sparsity vs error trade-off for FS-LSSVM models. Even though they run experiments on large scale datasets like Forest Cover dataset, the scalability of these methods are restricted to available memory on a single machine. Moreover, they don't exploit the possibility of parallelism available in several components of the FS-LSSVM model. Another work \cite{Mall2014} converts the Big Data into a Big Network and then uses a network based subset selection technique (FURS \cite{Mall2013FURS}) to obtain a representative subset of the original data. It then builds a FS-LSSVM model using this subset. However, in this paper we showcase that we can parallelize the subset selection technique which maximizes the \textit{Quadratic R\`enyi Entropy} for Big datasets and use the generated subset as the set of prototype vectors (PV) essential for building the FS-LSSVM model.
-
 
 \begin{algorithm} \label{lssvmalgo}
 \SetAlgoLined
@@ -560,91 +550,21 @@ In recent literature we find sparse reductions to FS-LSSVM methods \cite{Mall201
  \caption{Tuning FS-LSSVM}
 \end{algorithm}
 
-% needed in second column of first page if using \IEEEpubid
-%\IEEEpubidadjcol
-
-% An example of a floating figure using the graphicx package.
-% Note that \label must occur AFTER (or within) \caption.
-% For figures, \caption should occur after the \includegraphics.
-% Note that IEEEtran v1.7 and later has special internal code that
-% is designed to preserve the operation of \label within \caption
-% even when the captionsoff option is in effect. However, because
-% of issues like this, it may be the safest practice to put all your
-% \label just after \caption rather than within \caption{}.
-%
-% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
-% option should be used if it is desired that the figures are to be
-% displayed while in draft mode.
-%
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{myfigure}
-% where an .eps filename suffix will be assumed under latex, 
-% and a .pdf suffix will be assumed for pdflatex; or what has been declared
-% via \DeclareGraphicsExtensions.
-%\caption{Simulation Results}
-%\label{fig_sim}
-%\end{figure}
-
-% Note that IEEE typically puts floats only at the top, even when this
-% results in a large percentage of a column being occupied by floats.
-
-
-% An example of a double column floating figure using two subfigures.
-% (The subfig.sty package must be loaded for this to work.)
-% The subfigure \label commands are set within each subfloat command, the
-% \label for the overall figure must come after \caption.
-% \hfil must be used as a separator to get equal spacing.
-% The subfigure.sty package works much the same way, except \subfigure is
-% used instead of \subfloat.
-%
-%\begin{figure*}[!t]
-%\centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
-%\label{fig_second_case}}}
-%\caption{Simulation results}
-%\label{fig_sim}
-%\end{figure*}
-%
-% Note that often IEEE papers with subfigures do not employ subfigure
-% captions (using the optional argument to \subfloat), but instead will
-% reference/describe all of them (a), (b), etc., within the main caption.
-
-
-% An example of a floating table. Note that, for IEEE style tables, the 
-% \caption command should come BEFORE the table. Table text will default to
-% \footnotesize as IEEE normally uses this smaller font for tables.
-% The \label must come after \caption as always.
-%
-%\begin{table}[!t]
-%% increase table row spacing, adjust to taste
-%\renewcommand{\arraystretch}{1.3}
-% if using array.sty, it might be a good idea to tweak the value of
-% \extrarowheight as needed to properly center the text within the cells
-%\caption{An Example of a Table}
-%\label{table_example}
-%\centering
-%% Some packages, such as MDW tools, offer better commands for making tables
-%% than the plain LaTeX2e tabular which is used here.
-%\begin{tabular}{|c||c|}
-%\hline
-%One & Two\\
-%\hline
-%Three & Four\\
-%\hline
-%\end{tabular}
-%\end{table}
-
-
-% Note that IEEE does not put floats in the very first column - or typically
-% anywhere on the first page for that matter. Also, in-text middle ("here")
-% positioning is not used. Most IEEE journals use top floats exclusively.
-% Note that, LaTeX2e, unlike IEEE journals, places footnotes above bottom
-% floats. This can be corrected via the \fnbelowfloat command of the
-% stfloats package.
 \section{FS-LSSVM Implementation} \label{fsimpl}
+
+Our software tackles three major issues w.r.t. the implementation of the FS-LSSVM.
+
+\begin{itemize}
+\item \textbf{Tuning Kernel Models}:
+Since the performance of kernel based models is sensitive with respect to the choice of hyper-parameters, one has to choose a mechanism of model selection or hyper-parameter optimization. In FS-Scala, we implement the Grid Search and Coupled Simulated Annealing global optimization algorithms for model tuning.
+
+\item \textbf{Parallel Computation} \label{mr}:
+Big Data analysis requires the distribution of computational work load, \textit{MapReduce} is the dominant paradigm employed for writing distributed data processing programs. In FS-Scala we leverage \textit{MapReduce} to distribute the computation in the pre-processing, training and cross-validation tasks.
+
+\item \textbf{Infrastructure Flexibility}:
+The big data landscape has many tools which enable the storage and analysis of large streams of data, they consist of technologies such as, but not limited to \textit{Apache Spark}, \textit{Hadoop}, Graph Databases like \textit{Titan} \cite{Titan:2014}, \textit{OrientDB} \cite{OrientDB:2010}, \textit{Neo4j} \cite{Neo4j:2010}. Creating a powerful framework for model training and evaluation requires the decoupling of storage and processing infrastructure from the actual logic that implements the architecture of learning models.
+\end{itemize}
+
 The implementation of the FS-LSSVM in FS-Scala, outlined in algorithm \ref{lssvmalgo} is as described in the original article of Brabanter et.al \cite{DeBrabanter2010}. Kernel based models all implement the interface \textit{GloballyOptimizable} in the optimization module. Since the \textit{GlobalOptimizer} and its subclasses (i.e. \textit{GridSearch} and \textit{CoupledSimulated Annealing}) all optimize models which implement the \text{GloballyOptimizable} interface, it enables tuning of models with a variety of global optimization algorithms convenient.
 
 \subsection*{Architecture} \label{archi}
@@ -654,7 +574,7 @@ Figure \ref{fig:struct} shows the organization of modules in FS-Scala. It can be
 \item Model Classes:
 This is the core set of classes which form the heart of the library, a number of abstract model categories are defined each with its own set of defined behaviours. 
 \item Optimization API:
-A module which houses the implementation of common optimization methods (i.e. Gradient and Gradient free). Currently FS-Scala has implementations for Conjugate Gradient, Gradient Descent, Grid Search and Coupled Simulated Annealing \cite{Xavier-De-Souza2010}. 
+A module which houses the implementation of common optimization methods (i.e. Gradient and Gradient free). Currently FS-Scala has implementations for Conjugate Gradient, Gradient Descent, Grid Search and Coupled Simulated Annealing \cite{Xavier-De-Souza2010} (CSA). 
 \item Kernels:
 FS-Scala is equipped with a powerful abstract API for representing kernel functions. The module has two abstract classes to outline the behaviors of kernels used in SVM based applications as well as density estimation. The library comes bundled with an implementation for AFE as well as for common SVM kernels i.e. RBF, Polynomial, Laplace, Exponential. New kernel functions can be easily added to the library by extending the base classes in this module.
 
@@ -698,64 +618,45 @@ This module contains code to carry out auxiliary tasks for model learning and op
 \label{fig:struct}
 \end{figure}
 
-\subsection*{Class Hierarchy}
+\subsection*{Map Reduce}
 
-Figures \ref{fig:modelUML} and \ref{fig:modelUML1} depict the class hierarchy structures of the core and optimization modules respectively, we can discuss their role in depth.
+As discussed earlier \ref{mr}, we use \textit{MapReduce} where ever possible in order to distribute the workload using \textit{Apache Spark}. Due to the primal formulation of the FS-LSSVM, the solution of its associated optimization problem is a linear program of order $m+1 \times m+1$ where $m$ is the number of prototypes selected to construct the kernel matrix in kernel based FS-LSSVM. Procedure \ref{cgmr} outlines the procedure to estimate the parameters $\hat{w},\ \hat{b}$ of the FS-LSSVM model discussed in section \ref{sec:fs}, using the \textit{Conjugate Gradient} algorithm. 
 
-\subsubsection*{Core Components}
-The core module consists of a set of classes which all originate from a base abstraction called \textit{Model}. It also has classes \textit{ParameterizedLearner} and \textit{LinearModel} representing the core behaviors of parameter based Machine Learning models which form a large chunk of current learning techniques. By using generic typing inherent in the Scala language, one is able to separate the logic of a model from the details of the underlying data infrastructure. This is particularly relevant due to the explosion of data processing frameworks and systems like graph databases, Apache Spark, key value stores, column oriented databases, etc.
+Using \textit{MapReduce}, we calculate $A = \left ( \hat{\Phi}^{\intercal}_e \hat{\Phi}_e + \frac{\mathit{I}_{m+1}}{\gamma} \right )$ and $b = \hat{\Phi}^{\intercal}_e Y$. We use these results to carry out iterations of the Conjugate Gradient updates until the maximum number of iterations is reached.
 
-\begin{figure}[h]
-\begin{adjustbox}{max width=0.5\textwidth}
-\begin{tikzpicture}
-    \begin{interface}[text width =3 cm]{Model}{0 ,0}
-        \attribute { g : G }
-    \end{interface}
-    
-    \begin{interface}[]{ParameterizedLearner}{ 0 , -3}
-        \implement{Model}
-        \attribute{params : Q}
-        \attribute{optimizer : RegularizedOptimizer}
-        \operation{learn() }
-    \end{interface}
-    
-    \begin{interface}[]{EvaluableModel}{ 6 , 0}
-        \operation{evaluate(config: Map[String, String]) }
-    \end{interface}
-    
-    \begin{abstractclass}[text width =3 cm]{LinearModel}{6 , -3}
-        \implement{ParameterizedLearner}
-        \implement{EvaluableModel}
-        \operation{predict(point) }
-        \operation{clearParameters() }
-    \end{abstractclass}
-    
-    \begin{interface}[]{GloballyOptimizable}{ 6 , -6}
-        \attribute{hyper\_parameters: List[String]}
-        \attribute{current\_state: Map[String, Double]}
-        \operation{energy(h: Map[String, Double], options: Map[String, String]) }
-    \end{interface}
-    
-    \begin{abstractclass}[]{KernelizedModel}{0 , -6}
-        \inherit{LinearModel}
-        \implement{GloballyOptimizable}
-        \attribute{nPoints: Long}
-        \attribute{prototypes: List[Long]}
-        \operation{featureMap(point: Q)}
-        \operation{applyKernel(kernel: SVMKernel) }
-        \operation{crossvalidate(folds: Int, reg: Double)}
-        \operation{applyFeatureMap()}
-    \end{abstractclass}
-    
-\end{tikzpicture}
-\end{adjustbox}
-\caption{Class Hierarchy of Models}
-\label{fig:modelUML}
-\end{figure}
+\begin{algorithm}\label{cgmr}
+    \DontPrintSemicolon
+    \KwData{$X = [x^i],\ x^i\ \epsilon \ \mathbf{R}^n$, 
+    $\hat{\phi} : \mathbf{R}^n \longrightarrow \mathbf{R}^m$, 
+    $Y = [y^i], y^i \epsilon \mathbf{R}$, $\gamma$}
+    \KwResult{$\left( \begin{matrix}
+\hat{w}\\ 
+\hat{b}
+\end{matrix}\right ) = 
+\left ( \hat{\Phi}^{\intercal}_e \hat{\Phi}_e + \frac{\mathit{I}_{m+1}}{\gamma} \right )^{-1} \hat{\Phi}^{\intercal}_e Y$}
+    \Begin{
+        $MapFn(x, y)$:\;
+        \ \   $M \longleftarrow \hat{\phi}(x) \hat{\phi}(x)^T$\;
+        \ \   $v \longleftarrow \hat{\phi}(x) \ y$\;
+        $emit(M,v)$\;
+    }
+    \Begin{
+        $RedFn((M, v), (M', v'))$:\;
+        $emit(M + M', v + v')$\;
+    }
+    \Begin{
+        $(F, v) \longleftarrow MapReduce(X, MapFn, RedFn)$\;
+        $A \longleftarrow F + \frac{1}{\gamma} \mathbf{I}_{m \times m}$\;
+        \BlankLine
+        \nl\For{$i \longleftarrow 1 \ to \ max iterations $}{
+            $(\hat{w}, \hat{b}) \longleftarrow CGUpdate(\hat{w}, \hat{b}, A, v)$
+        }
+    }
+\caption{Conjugate Gradient Map Reduce}
+\end{algorithm}
 
-\subsubsection*{Kernel Functions and Kernel Based Models}
-The kernel module contains implementations of SVM kernels and AFE. The class \textit{KernelizedModel} defines kernel based linear models which use the \textit{GlobalOptimizer} class to tune values of hyper-parameters. The actual implementation of the \textit{Automatic Feature Extraction} is abstracted out in the parent classes, thereby reducing the effort of writing new SVM kernels to merely expressing their evaluation functions.
-
+\subsection*{Optimization/Hyper-parameter tuning}
+Figure \ref{fig:modelUML1} depicts the class hierarchy structure of the Optimization module of FS-Scala. The FS-LSSVM model class has an embedded optimization object which is inherits from the \textit{Optimizer} interface. Implementations of Conjugate Gradient and Gradient Descent are provided in the optimization module. New optimization algorithms can be added by inheriting from the top level \textit{Optimizer} interface or the \textit{RegularizedOptimizer} abstract class in case one is working with parametric models which involve regularization. Another important component of the optimization module is the \textit{GlobalOptimizer} interface which acts as a skeleton for implementing gradient free global optimization algorithms. We have implemented simple Grid Search and CSA, for tuning kernel based models. CSA as proposed by De Souza et.al \cite{Xavier-De-Souza2010} creates a grid(simplex) of hyper-parameter values and treats each point as a Simulated Annealing (SA) process.
 \begin{figure}[ht]
 \begin{adjustbox}{max width=0.5\textwidth}
 \begin{tikzpicture}
@@ -806,9 +707,6 @@ The kernel module contains implementations of SVM kernels and AFE. The class \te
 \caption{Class Hierarchy of Optimization API}
 \label{fig:modelUML1}
 \end{figure}
-
-\subsubsection*{Optimization Methods}
-Parametric models in FS-Scala have an embedded optimization object which is inherits from the \textit{Optimizer} interface. Implementations of Conjugate Gradient and Gradient Descent are provided in the optimization module. New optimization algorithms can be added by inheriting from the top level \textit{Optimizer} interface or the \textit{RegularizedOptimizer} abstract class in case one is working with parametric models which involve regularization. Another important component of the optimization module is the \textit{GlobalOptimizer} interface which acts as a skeleton for implementing gradient free global optimization algorithms.
 
 
 \section{Experiments} \label{exp}
@@ -880,7 +778,7 @@ In this paper, \textit{FS-Scala}, a Scala based implementation for training and 
 \appendices
 % use section* for acknowledgement
 \section*{Acknowledgment}
-
+This work was supported by EU: ERC AdG A-DATADRIVE-B (290923), Research Council KUL: GOA/10/-/09 MaNet , CoE PFV/10/002 (OPTEC), BIL12/11T; PhD/Postdoc grants-Flemish Government; FWO: projects: G.0377.12 (Structured systems), G.088114N (Tensor based data similarity); PhD/Postdoc grants; IWT: projects: SBO POM (100031); PhD/Postdoc grants; iMinds Medical Information Technologies SBO 2014-Belgian Federal Science Policy Office: IUAP P7/19 (DYSCO, Dynamical systems, control and optimization, 2012-2017).
 
 
 % Can use something like this to put references on a page
