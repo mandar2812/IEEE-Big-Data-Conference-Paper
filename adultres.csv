@@ -1,0 +1,13 @@
+kernel,prototypes,globaloptimization,gridsize,gridresolution,scale,maxF1score,stdF,areaunderROC,stdR
+RBF,50,gs,5,0.35,linear,0.69168,0.0187,0.65261,0.0559 
+RBF,50,csa,5,0.35,linear,0.709,0.0198,0.71215,0.00149
+RBF,50,gs,4,0.35,linear,0.69291,0.02286,0.64006,0.0928
+RBF,50,csa,4,0.35,linear,0.7253,0.0229,0.7205,0.0714
+RBF,50,csa,3,0.35,linear,0.69449,0.0295,0.68823,0.06209
+RBF,50,gs,3,0.35,linear,0.67212,0.0076,0.54631,0.06288
+RBF,50,csa,3,0.35,linear,0.70296,0.0521,0.703,0.0760
+Exponential,50,gs,4,0.35,linear,0.68338,0.0223,0.66438,0.0465
+Exponential,50,csa,3,0.35,linear,0.73457,0.00621,0.74955,0.0392
+Exponential,50,csa,4,0.35,linear,0.73579,0.0189,0.75386,0.0229
+Linear,50,csa,3,0.35,linear,0.69770,0,0.68936,0
+Linear,50,csa,4,0.35,linear,0.69770,0,0.68936,0
